@@ -2,6 +2,8 @@ package com.algaworks.algalog.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,14 +60,14 @@ public class ClienteController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED) /* Em vez de retornar o 200 ok retorna 201 created */
-	public Cliente adicionar(@RequestBody Cliente cliente) { /* Vincular o parâmetro do método ao corpo da requisicao, deserializar o json que veio no corpo da requisicao*/
+	public Cliente adicionar(@Valid @RequestBody Cliente cliente) { /* Vincular o parâmetro do método ao corpo da requisicao, deserializar o json que veio no corpo da requisicao*/
 		
 		return clienteRepository.save(cliente); // boa prática retornar o bjeto criado
 		
 	}
 	
 	@PutMapping("{clienteId}")
-	public ResponseEntity<Cliente> atualizat (@PathVariable Long clienteId, @RequestBody Cliente cliente){
+	public ResponseEntity<Cliente> atualizat (@Valid @PathVariable Long clienteId, @RequestBody Cliente cliente){
 		
 		if(!clienteRepository.existsById(clienteId)) {
 			return ResponseEntity.notFound().build();

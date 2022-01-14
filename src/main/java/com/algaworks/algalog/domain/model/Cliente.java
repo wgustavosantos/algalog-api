@@ -8,6 +8,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -24,9 +28,18 @@ public class Cliente {
 	@Id /* Define a chave primaria*/
 	@GeneratedValue(strategy = GenerationType.IDENTITY) /*estrategia de gerecao da chave*/
 	private Long id;									// propriedade strategy definindo propriedade 											
-	private String nome;								// auto increment / IDENTITY -> forma nativa do BD 
+														// auto increment / IDENTITY -> forma nativa do BD 	
+	@NotBlank //nao so nulo, como tambem nao seja vazio
+	@Size(max = 60)//lax 60 caracteres
+	private String nome;
+	
+	@NotBlank
+	@Email
+	@Size(max = 255)
 	private String email;
-		
+	
+	@NotBlank
+	@Size(max = 20)
 	@Column(name = "fone") /* Notacao @Column com propriedade name definindo */
 	private String telefone;	// o nome da coluna no BD. Caso não seja especificada
 								// o padrao eh o nome da classe 
