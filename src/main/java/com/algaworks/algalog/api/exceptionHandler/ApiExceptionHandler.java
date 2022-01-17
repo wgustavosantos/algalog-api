@@ -22,45 +22,42 @@ import com.algaworks.algalog.domain.exception.NegocioException;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-@ControllerAdvice /* Componte do Spring mas com prositos especificos de tratar excecao para globalmente, p/ todos os controladores */
-public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
-	
-	private MessageSource messageSource;
+@ControllerAdvice
+public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
+	private MessageSource messageSource;
+	
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		
 		List<Erro.Campo> campos = new ArrayList<>();
 		
-		for( ObjectError error : ex.getBindingResult().getAllErrors()) {
-			
+		for (ObjectError error : ex.getBindingResult().getAllErrors()) {
 			String nome = ((FieldError) error).getField();
-			String mensagem = messageSource.getMessage(error, LocaleContextHolder.getLocale()); /* String mensagem = error.getDefaultMessage(); */
+			String mensagem = messageSource.getMessage(error, LocaleContextHolder.getLocale());
 			
-			Erro.Campo erro = new Erro.Campo(nome, mensagem);
-			campos.add(erro);
-			
+			campos.add(new Erro.Campo(nome, mensagem));
 		}
 		
-		Erro erro = new Erro();
-		erro.setStatus(status.value());
-		erro.setDataHora(LocalDateTime.now());
-		erro.setTitulo("Um ou mais campos estao invalidos. tente novamente");
-		erro.setCampos(campos);
-		return handleExceptionInternal(ex, erro , headers, status, request);
+		Erro problema = new Erro();
+		problema.setStatus(status.value());
+		problema.setDataHora(LocalDateTime.now());
+		problema.setTitulo("Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.");
+		problema.setCampos(campos);
+		
+		return handleExceptionInternal(ex, problema, headers, status, request);
 	}
 	
 	@ExceptionHandler(NegocioException.class)
-	public ResponseEntity<Object> handleNegocio (NegocioException ex, WebRequest request){ /* WebRequest request foi adicionado por ser necessario no argumento de handleExceptionInternal*/
-		
+	public ResponseEntity<Object> handleNegocio(NegocioException ex, WebRequest request) {
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		
-		Erro erro = new Erro();
-		erro.setStatus(status.value());
-		erro.setDataHora(LocalDateTime.now());
-		erro.setTitulo("Já existe cliente cadastrado com esse e-mail.");
+		Erro problema = new Erro();
+		problema.setStatus(status.value());
+		problema.setDataHora(LocalDateTime.now());
+		problema.setTitulo(ex.getMessage());
 		
-		return handleExceptionInternal(ex, erro, new HttpHeaders(), status, request);
+		return handleExceptionInternal(ex, problema, new HttpHeaders(), status, request);
 	}
+	
 }
